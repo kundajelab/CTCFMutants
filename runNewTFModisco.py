@@ -29,8 +29,8 @@ def parseArgument():
                         help='narrowPeak file with the optimal peaks or name of file with list of summits')
         parser.add_argument("--DESeq2OutputFileName", required=False,\
                         help='name of the file with the output from DESeq2, use only if doing differential peaks')
-        parser.add_argument("--genomeFileName", required=True,\
-                        help='name of file with the genome sequence')
+        parser.add_argument("--genomeFileName", required=False,\
+                        default = "/mnt/data/annotations/by_organism/mm10/GRCm38.p4.genome.fa", help='name of file with the genome sequence')
 	parser.add_argument("--chroms", required=False, action='append', \
                         default = ["chr8", "chr9"], \
                         help='chromosomes for which deepLIFT scores will be generated')
@@ -63,14 +63,20 @@ def runNewTFModisco(options):
         if (not options.differentialPeaks):
                 # The peaks are not differential peaks
                 assert (not options.negSet)
-                optimalBedFileName = peakInfoFileNamePrefix + ".bed"
-                summitPlusMinus =\
-                        makeSummitPlusMinus(optimalBedFileName, createOptimalBed=False, dataShape=(1,4,options.sequenceLength), bedFilegzip=False, \
-				chroms=options.chroms, maxPeakLength=options.maxPeakLength)
-                from sequenceOperations import makePositiveSequenceInputArraysFromNarrowPeaks
-                X, Y =\
-                        makePositiveSequenceInputArraysFromNarrowPeaks(options.peakInfoFileName, options.genomeFileName, createOptimalBed=False, \
-                                dataShape=(1,4,options.sequenceLength), chroms=options.chroms, multiMode=False, maxPeakLength=options.maxPeakLength)
+		from sequenceOperations import makePositiveSequenceInputArraysFromNarrowPeaks, makePositiveSequenceInputArraysFromFasta
+		if ((not options.peakInfoFileName.endswith("fa")) and (not options.peakInfoFileName.endswith("fasta"))) and \
+                        (not options.peakInfoFileName.endswith("fna")):
+			# The input is a narrowPeak file
+                	optimalBedFileName = peakInfoFileNamePrefix + ".bed"
+                	summitPlusMinus =\
+                        	makeSummitPlusMinus(optimalBedFileName, createOptimalBed=False, dataShape=(1,4,options.sequenceLength), bedFilegzip=False, \
+					chroms=options.chroms, maxPeakLength=options.maxPeakLength)
+                	X, Y =\
+                        	makePositiveSequenceInputArraysFromNarrowPeaks(options.peakInfoFileName, options.genomeFileName, createOptimalBed=False, \
+                                	dataShape=(1,4,options.sequenceLength), chroms=options.chroms, multiMode=False, maxPeakLength=options.maxPeakLength)
+		else:
+			# The input is a fasta file
+			X, Y = makePositiveSequenceInputArraysFromFasta(options.peakInfoFileName, dataShape=(1,4,options.sequenceLength))
         else:
                 # The peaks are differential peaks, so only the summits have been included
                 summitPlusMinus =\
@@ -122,6 +128,7 @@ def runNewTFModisco(options):
 	reload(modisco.core)
 	reload(modisco.coordproducers)
 	reload(modisco.metaclusterers)
+	print("Running TF-Modisco")
 	tfmodisco_results =\
 		modisco.tfmodisco_workflow.workflow.TfModiscoWorkflow(sliding_window_size=21, flank_size=10, target_seqlet_fdr=0.2, \
 			seqlets_to_patterns_factory =\
@@ -129,6 +136,7 @@ def runNewTFModisco(options):
 					initial_flank_to_add=5, kmer_len=8, num_gaps=1, num_mismatches=0, final_min_cluster_size=20))\
 		(task_names = ["task0"], contrib_scores = task_to_scores, hypothetical_contribs = task_to_hyp_scores, one_hot = dataReshape)
 	# Save the results
+	print("Saving TF-Modisco results")
 	reload(modisco.util)
 	grp = h5py.File(options.TFModiscoResultsFileName)
 	tfmodisco_results.save_hdf5(grp)
