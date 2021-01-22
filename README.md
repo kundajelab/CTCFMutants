@@ -11,3 +11,5 @@ This repository contains the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDIS
 * seaborn 0.9.0
 * modisco 0.5.1.1
 * pybedtools 0.7.8
+* biopython 1.68
+* cython 0.29.12
