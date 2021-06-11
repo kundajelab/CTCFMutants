@@ -41,7 +41,7 @@ def parseArgument():
         help='narrowPeak file with the optimal peaks or name of file with list of summits')
     parser.add_argument("--DESeq2OutputFileName", required=False,\
         help='name of the file with the output from DESeq2, use only if doing differential peaks')
-    parser.add_argument("--genomeFileName", required=True,\
+    parser.add_argument("--genomeFileName", required=False,\
         help='name of file with the genome sequence')
     parser.add_argument("--chroms", required=False, action='append', \
         default = ["chr8", "chr9"], \
@@ -76,6 +76,7 @@ def loadSequenceData(options):
             (not options.peakInfoFileName.endswith("fasta"))) and \
             (not options.peakInfoFileName.endswith("fna")):
             # The input is a narrowPeak file
+            assert (options.genomeFileName != None)
             optimalBedFileName = peakInfoFileNamePrefix + ".bed"
             summitPlusMinus =\
                 makeSummitPlusMinus(optimalBedFileName, createOptimalBed=False, \
@@ -93,6 +94,7 @@ def loadSequenceData(options):
                 dataShape=(1,4,options.sequenceLength))
     else:
         # The peaks are differential peaks, so only the summits have been included
+	assert (options.genomeFileName != None)
         summitPlusMinus =\
             makeSummitPlusMinus(options.peakInfoFileName, createOptimalBed=False, \
                 dataShape=(1,4,options.sequenceLength), summitCol=1, \
