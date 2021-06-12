@@ -9,7 +9,7 @@ This repository contains the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDIS
 * matplotlib 2.2.3
 * h5py 2.6.0
 * seaborn 0.9.0
-* modisco 0.5.1.1
+* modisco 0.5.1.1 or 0.5.5.6
 * pybedtools 0.7.8
 * biopython 1.68
 * cython 0.29.12
