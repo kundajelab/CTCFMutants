@@ -23,7 +23,7 @@ This repository contains the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDIS
 ## Utilities for Code in evaluationScripts (in utils):
 * getBestFIMOBed.py: gets the best motif hit from FIMO in a bed file
 * makeViolinPlotsCoreDownstreamCTCFs.py: make violin plots for CTCFs analysis visualizations
-* getDeepLIFTScores.py: wrapper for DeepLIFT for models trained using Keras 0.3.2 with the Theano backend
+* getDeepLIFTScores.py: wrapper for DeepLIFT (Shrikumar et al., "Learning important features through propagating activation differences," ICML, 2017) for models trained using Keras 0.3.2 with the Theano backend
 * makeBedGraphFromPositionScores.py: makes a single bedGraph file from a text file with per-position DeepLIFT scores
 * makeBedGraphFromPositionScoresPerSequence.py: makes a bedGraph file for each sequence from a text file with per-position DeepLIFT scores
 * getDeepLIFTScoresCrossVal.py: wrapper for DeepLIFT for models trained using Keras 0.3.2 with the Theano background that iterates through cross-validation folds
