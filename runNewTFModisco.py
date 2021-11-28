@@ -41,7 +41,7 @@ def parseArgument():
         help='narrowPeak file with the optimal peaks or name of file with list of summits')
     parser.add_argument("--DESeq2OutputFileName", required=False,\
         help='name of the file with the output from DESeq2, use only if doing differential peaks')
-    parser.add_argument("--genomeFileName", required=True,\
+    parser.add_argument("--genomeFileName", required=False,\
         help='name of file with the genome sequence')
     parser.add_argument("--chroms", required=False, action='append', \
         default = ["chr8", "chr9"], \
@@ -76,6 +76,7 @@ def loadSequenceData(options):
             (not options.peakInfoFileName.endswith("fasta"))) and \
             (not options.peakInfoFileName.endswith("fna")):
             # The input is a narrowPeak file
+            assert (options.genomeFileName != None)
             optimalBedFileName = peakInfoFileNamePrefix + ".bed"
             summitPlusMinus =\
                 makeSummitPlusMinus(optimalBedFileName, createOptimalBed=False, \
@@ -93,6 +94,7 @@ def loadSequenceData(options):
                 dataShape=(1,4,options.sequenceLength))
     else:
         # The peaks are differential peaks, so only the summits have been included
+        assert (options.genomeFileName != None)
         summitPlusMinus =\
             makeSummitPlusMinus(options.peakInfoFileName, createOptimalBed=False, \
                 dataShape=(1,4,options.sequenceLength), summitCol=1, \
@@ -136,35 +138,20 @@ def runNewTFModisco(options):
     dataReshape = loadSequenceData(options)
     task_to_scores, task_to_hyp_scores = loadScoreData(options)
     # Run TF-Modisco
-    reload(modisco)
-    reload(modisco.backend.tensorflow_backend)
-    reload(modisco.backend)
-    reload(modisco.nearest_neighbors)
-    reload(modisco.affinitymat.core)
-    reload(modisco.affinitymat.transformers)
-    reload(modisco.tfmodisco_workflow.seqlets_to_patterns)
-    reload(modisco.tfmodisco_workflow.workflow)
-    reload(modisco.aggregator)
-    reload(modisco.cluster.core)
-    reload(modisco.cluster.phenograph.core)
-    reload(modisco.cluster.phenograph.cluster)
-    reload(modisco.core)
-    reload(modisco.coordproducers)
-    reload(modisco.metaclusterers)
     print("Running TF-Modisco")
     tfmodisco_results =\
         modisco.tfmodisco_workflow.workflow.TfModiscoWorkflow(sliding_window_size=21, \
             flank_size=10, target_seqlet_fdr=0.2, \
 	    seqlets_to_patterns_factory =\
 	        modisco.tfmodisco_workflow.seqlets_to_patterns.TfModiscoSeqletsToPatternsFactory(trim_to_window_size=20, \
-		    initial_flank_to_add=5, kmer_len=8, num_gaps=1, \
-                    num_mismatches=0, final_min_cluster_size=20))\
+		   initial_flank_to_add=5, kmer_len=8, num_gaps=1, \
+                   num_mismatches=0, final_min_cluster_size=20))\
 	    (task_names = ["task0"], contrib_scores = task_to_scores, \
                 hypothetical_contribs = task_to_hyp_scores, one_hot = dataReshape)
+	
     # Save the results
     print("Saving TF-Modisco results")
-    reload(modisco.util)
-    grp = h5py.File(options.TFModiscoResultsFileName)
+    grp = h5py.File(options.TFModiscoResultsFileName, 'w')
     tfmodisco_results.save_hdf5(grp)
 
 if __name__ == "__main__":

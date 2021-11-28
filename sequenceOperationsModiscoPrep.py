@@ -4,10 +4,6 @@ import subprocess
 import pybedtools as bt
 import numpy as np
 from Bio import SeqIO
-import pyximport
-importers = pyximport.install()
-from one_hot_encode import one_hot_encode as one_hot_encode_cython
-pyximport.uninstall(*importers)
 
 def show_value(s):
         """
@@ -121,7 +117,7 @@ def createSetForDeepLearning(genomeFileName, regionList, peakFileNamePrefix, hal
                         # Check if the current region is too close to the end of the chromosome
                         if chrom not in chromSizesDict:
                                 # The current chromosome is not in the dictionary, so skip it
-                                print "Chromosome " + chrom + " is not in the list of chromosomes"
+                                print ("Chromosome " + chrom + " is not in the list of chromosomes")
                                 continue
                         if end > chromSizesDict[chrom] - chromEdgeDistLimit:
                                 # Do not use the current region because it is too close to the end of the chromosome
@@ -185,11 +181,37 @@ def createPerBaseTracksMat(perBaseTracks, width, sampleCount, divisor):
                 perBaseTracksMat = np.vstack((perBaseTracksMat, pbt[perBaseTracksIndex, :]))
         return perBaseTracksMat
 
-def one_hot_encode(sequence):
-        encoded_sequence = np.zeros((4, len(sequence)), dtype=np.int8)
-        one_hot_encode_cython(sequence, encoded_sequence)
-        numNs = len(sequence) - np.sum(encoded_sequence)
-        return encoded_sequence, numNs
+def oneHotEncode(sequence):
+        encodedSequence = np.zeros((4, len(sequence)), dtype=np.int8)
+        sequenceDict = {}
+        sequenceDict["A"] = np.array([1, 0, 0, 0])
+        sequenceDict["a"] = np.array([1, 0, 0, 0])
+        sequenceDict["C"] = np.array([0, 1, 0, 0])
+        sequenceDict["c"] = np.array([0, 1, 0, 0])
+        sequenceDict["G"] = np.array([0, 0, 1, 0])
+        sequenceDict["g"] = np.array([0, 0, 1, 0])
+        sequenceDict["T"] = np.array([0, 0, 0, 1])
+        sequenceDict["t"] = np.array([0, 0, 0, 1])
+        sequenceDict["N"] = np.array([0, 0, 0, 0])
+        sequenceDict["n"] = np.array([0, 0, 0, 0])
+        # These are all 0's even though they should ideally have 2 indices with 0.5's because storing ints requires less space than storing floats
+        sequenceDict["R"] = np.array([0, 0, 0, 0])
+        sequenceDict["r"] = np.array([0, 0, 0, 0])
+        sequenceDict["Y"] = np.array([0, 0, 0, 0])
+        sequenceDict["y"] = np.array([0, 0, 0, 0])
+        sequenceDict["M"] = np.array([0, 0, 0, 0])
+        sequenceDict["m"] = np.array([0, 0, 0, 0])
+        sequenceDict["K"] = np.array([0, 0, 0, 0])
+        sequenceDict["k"] = np.array([0, 0, 0, 0])
+        sequenceDict["W"] = np.array([0, 0, 0, 0])
+        sequenceDict["w"] = np.array([0, 0, 0, 0])
+        sequenceDict["S"] = np.array([0, 0, 0, 0])
+        sequenceDict["s"] = np.array([0, 0, 0, 0])
+        for i in range(len(sequence)):
+                # Iterate through the bases in the sequence and record each
+                encodedSequence[:,i] = sequenceDict[sequence[i]]
+        numNs = len(sequence) - np.sum(encodedSequence)
+        return encodedSequence, numNs
 
 def reverse_complement(encoded_sequences):
         # Because the encoding is A, C, G, T in that order, can just reverse each sequence along both axes.
@@ -198,7 +220,7 @@ def reverse_complement(encoded_sequences):
 def addSequenceToArray(channel1, channel2, channel3, sequenceRecord, perBaseTracks, allData, sampleCount, perBaseTracksDivisor=2):
         # Add a sequence and its reverse complement to a numpy array
         perBaseTracksMat = createPerBaseTracksMat(perBaseTracks, channel3, sampleCount, perBaseTracksDivisor)
-        sequenceArray, numNs = one_hot_encode(str(sequenceRecord.seq).strip())
+        sequenceArray, numNs = oneHotEncode(str(sequenceRecord.seq).strip())
         sequenceArrayReshape = np.reshape(np.vstack((sequenceArray, perBaseTracksMat)), (channel1, channel2, channel3))
         allData[sampleCount,:,:,:] = sequenceArrayReshape
         sampleCount = sampleCount + 1
@@ -212,7 +234,7 @@ def addSequenceToArray(channel1, channel2, channel3, sequenceRecord, perBaseTrac
 def addSequenceToArrayNoRC(channel1, channel2, channel3, sequenceRecord, perBaseTracks, allData, sampleCount):
         # Add a sequence and its reverse complement to a numpy array
         perBaseTracksMat = createPerBaseTracksMat(perBaseTracks, channel3, sampleCount, 2)
-        sequenceArray, numNs = one_hot_encode(str(sequenceRecord.seq).strip())
+        sequenceArray, numNs = oneHotEncode(str(sequenceRecord.seq).strip())
         sequenceArrayReshape = np.reshape(np.vstack((sequenceArray, perBaseTracksMat)), (channel1, channel2, channel3))
         allData[sampleCount,:,:,:] = sequenceArrayReshape
         sampleCount = sampleCount + 1
