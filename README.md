@@ -1,5 +1,5 @@
 # CTCFMutants
-This repository contains the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDISco v0.4.4.2-alpha: Technical Note," arXiv, 2018) that was used for obtaining TF-MoDISco motifs from deep convolutional neural networks trained to predict whether a CTCF ChIP-seq peak would have significantly lower in a dataset from CTCF with a mutated zinc finger as well as ipython notebooks for visualizing the TF-MoDISco results from those neural networks.  It also contains scripts for analyses involving the TF-MoDISco results.
+This repository contains code for generating the results in Kaplow et al., "Neural network modeling of differential binding between wild-type and mutant CTCF reveals putative binding preferences for zinc fingers 1-2," BMC Genomics, 2022, including the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDISco v0.4.4.2-alpha: Technical Note," arXiv, 2018) that was used for obtaining TF-MoDISco motifs from deep convolutional neural networks trained to predict whether a CTCF ChIP-seq peak would have significantly lower in a dataset from CTCF with a mutated zinc finger as well as ipython notebooks for visualizing the TF-MoDISco results from those neural networks.  It also contains scripts for analyses involving the TF-MoDISco results.
 ## Code for General Use:
 * runNewTFModisco.py: TF-MoDISco wrapper
 * sequenceOperationsModiscoPrep.py: utilities used by runNewTFModisco.py
@@ -48,8 +48,8 @@ This repository contains the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDIS
 * bedGraphToBigWig (http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/bedGraphToBigWig) (evaluationScripts only)
 * Biopython 1.68 (evaluationScripts only)
 * cython 0.29.12 (evaluationScripts only)
-## Citation
+## Citation:
 •	Kaplow IM*, Banerjee A, Foo CS*.  Neural network modeling of differential binding between wild-type and mutant CTCF reveals putative binding preferences for zinc fingers 1-2.  BMC Genomics, 23: 295, 2022.
-## Contact
+## Contact:
 Irene Kaplow: ikaplow@cs.stanford.edu
 Chuan Sheng Foo: csfoo@cs.stanford.edu
