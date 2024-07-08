@@ -57,14 +57,14 @@ def makeSummitPlusMinus(optimalPeakFileName, createOptimalBed=False, dataShape=(
         if startCol != None:
                 # The start positions are in the file (narrowPeak file and not summit list)
                 summitPlusMinus =\
-                        bt.BedTool([bt.Interval(r[0], int(r[startCol]) + int(r[summitCol]) - halfWindowSize, int(r[startCol])\
-                                + int(r[summitCol]) + halfWindowSize)\
+                        bt.BedTool([bt.Interval(r[0], int(int(r[startCol]) + int(r[summitCol]) - halfWindowSize), int(int(r[startCol])\
+                                + int(r[summitCol]) + halfWindowSize))\
                                 for r in optimalRegionListFilt])
         else:
                 # The start postions are not in the file (summit list and not narrowPeak file)
                 summitPlusMinus =\
-                        bt.BedTool([bt.Interval(r[0], int(r[summitCol]) - halfWindowSize, \
-                                int(r[summitCol]) + halfWindowSize)\
+                        bt.BedTool([bt.Interval(r[0], int(int(r[summitCol]) - halfWindowSize), \
+                                int(int(r[summitCol]) + halfWindowSize))\
                                 for r in optimalRegionListFilt])
         if chroms:
                 # Filter the summitsPlusMinus list based on the chromosomes
@@ -77,19 +77,19 @@ def defineInterval(r, halfWindowSize, summitPresent, windowSizeOdd=False):
         chrom = show_value(r[0])
         if summitPresent:
                 # Convert the region to a summit-centered interval
-                start = int(show_value(r[1])) + int(show_value(r[9])) - halfWindowSize
+                start = int(int(show_value(r[1])) + int(show_value(r[9])) - halfWindowSize)
                 if windowSizeOdd:
                         # Subtract 1 from the start
                         start = start - 1
-                end = int(show_value(r[1])) + int(show_value(r[9])) + halfWindowSize
+                end = int(int(show_value(r[1])) + int(show_value(r[9])) + halfWindowSize)
                 return [chrom, start, end]
         else:
                 # Use the centers of the peaks instead of summits
-                start = int(show_value(r[1])) + int(round((float(show_value(r[2])) - float(show_value(r[1])))/2.0)) - halfWindowSize
+                start = int(int(show_value(r[1])) + int(round((float(show_value(r[2])) - float(show_value(r[1])))/2.0)) - halfWindowSize)
                 if windowSizeOdd:
                         # Subtract 1 from the start
                         start = start - 1
-                end = int(show_value(r[1])) + int(round((float(show_value(r[2])) - float(show_value(r[1])))/2.0)) + halfWindowSize
+                end = int(int(show_value(r[1])) + int(round((float(show_value(r[2])) - float(show_value(r[1])))/2.0)) + halfWindowSize)
                 return [chrom, start, end]
 
 def createSetForDeepLearning(genomeFileName, regionList, peakFileNamePrefix, halfWindowSize, summitPresent=True, maxPeakLength=None, \
@@ -127,7 +127,8 @@ def createSetForDeepLearning(genomeFileName, regionList, peakFileNamePrefix, hal
                         # The current region is too log, so skip it
                         continue
                 regionListFiltList.append(r)
-                intervalList.append(bt.Interval(chrom, start, end, show_value(r[4])))
+                #intervalList.append(bt.Interval(chrom, start, end, show_value(r[4])))
+                intervalList.append(bt.Interval(chrom, start, end, show_value(r[3])))
         regionListFilt = bt.BedTool(regionListFiltList)
         summitPlusMinus = bt.BedTool(intervalList)
         fastaFileName = None
