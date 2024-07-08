@@ -48,3 +48,8 @@ This repository contains the wrapper for TF-MoDISco (Shrikumar et al., "TF-MoDIS
 * bedGraphToBigWig (http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/bedGraphToBigWig) (evaluationScripts only)
 * Biopython 1.68 (evaluationScripts only)
 * cython 0.29.12 (evaluationScripts only)
+## Citation
+•	Kaplow IM*, Banerjee A, Foo CS*.  Neural network modeling of differential binding between wild-type and mutant CTCF reveals putative binding preferences for zinc fingers 1-2.  BMC Genomics, 23: 295, 2022.
+## Contact
+Irene Kaplow: ikaplow@cs.stanford.edu
+Chuan Sheng Foo: csfoo@cs.stanford.edu
